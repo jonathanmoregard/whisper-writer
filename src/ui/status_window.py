@@ -26,10 +26,10 @@ class StatusWindow(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing, False)
-        painter.setBrush(QBrush(QColor(255, 255, 255, 230)))
-        painter.setPen(QPen(QColor(60, 60, 60), 2))
-        painter.drawRect(1, 1, self.width() - 2, self.height() - 2)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QBrush(QColor(255, 255, 255, 160)))
+        painter.setPen(QPen(QColor(60, 60, 60, 180), 2))
+        painter.drawRoundedRect(1, 1, self.width() - 2, self.height() - 2, 16, 16)
 
     def show(self):
         screen = QApplication.primaryScreen()
