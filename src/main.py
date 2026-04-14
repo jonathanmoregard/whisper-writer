@@ -13,7 +13,6 @@ from key_listener import KeyListener
 from recorder_worker import RecorderWorker
 from transcriber_worker import TranscriberWorker
 from typer_worker import TyperWorker
-from ui.main_window import MainWindow
 from ui.settings_window import SettingsWindow
 from ui.status_window import StatusWindow
 from transcription import create_local_model
@@ -60,16 +59,11 @@ class WhisperWriterApp(QObject):
         self._transcriber = None
         self._typer = None
 
-        self.main_window = MainWindow()
-        self.main_window.openSettings.connect(self.settings_window.show)
-        self.main_window.startListening.connect(self.key_listener.start)
-        self.main_window.closeApp.connect(self.exit_app)
-
         if not ConfigManager.get_config_value('misc', 'hide_status_window'):
             self.status_window = StatusWindow()
 
         self.create_tray_icon()
-        self.main_window.show()
+        self.key_listener.start()
 
     def create_tray_icon(self):
         """
@@ -78,10 +72,6 @@ class WhisperWriterApp(QObject):
         self.tray_icon = QSystemTrayIcon(QIcon(os.path.join('assets', 'ww-logo.png')), self.app)
 
         tray_menu = QMenu()
-
-        show_action = QAction('WhisperWriter Main Menu', self.app)
-        show_action.triggered.connect(self.main_window.show)
-        tray_menu.addAction(show_action)
 
         settings_action = QAction('Open Settings', self.app)
         settings_action.triggered.connect(self.settings_window.show)
