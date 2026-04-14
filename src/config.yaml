@@ -1,0 +1,35 @@
+model_options:
+  use_api: false
+  common:
+    language: null          # auto-detect (handles Swedish + English)
+    temperature: 0.0
+    initial_prompt: "Clean transcription without filler words."
+  local:
+    model: small            # good accuracy/speed balance; upgrade to medium if needed
+    device: cuda
+    compute_type: float16
+    condition_on_previous_text: true
+    vad_filter: false
+    model_path: null
+    hotwords: []        # e.g. ["whisper-writer", "PyQt5", "xdotool"]
+
+recording_options:
+  activation_key: ctrl_right
+  input_backend: pynput
+  recording_mode: hold_to_record   # hold to record, release to transcribe + type
+  sound_device: null        # null = default mic
+  sample_rate: 16000
+  silence_duration: 900
+  min_duration: 100
+
+post_processing:
+  writing_key_press_delay: 0.005
+  remove_trailing_period: false
+  add_trailing_space: true
+  remove_capitalization: false
+  input_method: xdotool
+
+misc:
+  print_to_terminal: true
+  hide_status_window: false
+  noise_on_completion: false
