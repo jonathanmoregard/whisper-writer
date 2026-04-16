@@ -16,20 +16,16 @@ def create_local_model():
     compute_type = local_model_options['compute_type']
     model_path = local_model_options.get('model_path')
 
-    if compute_type == 'int8':
-        device = 'cpu'
-        ConfigManager.console_print('Using int8 quantization, forcing CPU usage.')
+    configured = local_model_options.get('device')
+    if configured and configured not in ('auto', None):
+        device = configured
     else:
-        configured = local_model_options.get('device')
-        if configured and configured not in ('auto', None):
-            device = configured
-        else:
-            try:
-                import torch
-                device = 'cuda' if torch.cuda.is_available() else 'cpu'
-            except ImportError:
-                device = 'cpu'
-            ConfigManager.console_print(f'Auto-detected device: {device}')
+        try:
+            import torch
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        except ImportError:
+            device = 'cpu'
+    ConfigManager.console_print(f'Device: {device}, compute_type: {compute_type}')
 
     try:
         if model_path:
@@ -81,6 +77,10 @@ def transcribe_local_stream(audio_data, local_model=None, initial_prompt='', hot
     if local_model is None:
         local_model = create_local_model()
     model_options = ConfigManager.get_config_section('model_options')
+
+    sample_rate = ConfigManager.get_config_section('recording_options').get('sample_rate') or 16000
+    pad_samples = int(0.5 * sample_rate)  # 500ms silence padding
+    audio_data = np.concatenate([audio_data, np.zeros(pad_samples, dtype=np.int16)])
 
     audio_float = audio_data.astype(np.float32) / 32768.0
 

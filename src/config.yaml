@@ -1,36 +1,41 @@
+misc:
+  hide_status_window: false
+  noise_on_completion: false
+  pitch_detection_enabled: true
+  pitch_target: 96.96969696969697
+  pitch_unwanted: 108.10810810810811
+  print_to_terminal: true
 model_options:
-  use_api: false
+  api:
+    api_key: null
+    base_url: https://api.openai.com/v1
+    model: whisper-1
   common:
+    initial_prompt: "Clean transcription without filler words."
     language: en
     temperature: 0.0
-    initial_prompt: "Clean transcription without filler words."
   local:
-    model: distil-small.en
-    device: cuda
-    compute_type: float16
+    beam_size: 1
+    compute_type: int8
     condition_on_previous_text: true
-    vad_filter: true
-    beam_size: 1        # greedy decoding — fastest, negligible quality loss at temp=0
+    device: cuda
+    hotwords: []
+    model: distil-medium.en
     model_path: null
-    hotwords: []        # e.g. ["whisper-writer", "PyQt5", "xdotool"]
-
+    vad_filter: false
+  use_api: false
+post_processing:
+  add_trailing_space: true
+  input_method: xdotool
+  remove_capitalization: false
+  remove_trailing_period: false
+  replace_slash_word: true
+  writing_key_press_delay: 0.005
 recording_options:
   activation_key: ctrl_right
   input_backend: pynput
-  recording_mode: hold_to_record   # hold to record, release to transcribe + type
-  sound_device: null        # null = default mic
+  min_duration: 100
+  recording_mode: hold_to_record
   sample_rate: 16000
   silence_duration: 900
-  min_duration: 100
-
-post_processing:
-  writing_key_press_delay: 0.005
-  remove_trailing_period: false
-  add_trailing_space: true
-  remove_capitalization: false
-  input_method: xdotool
-
-misc:
-  print_to_terminal: true
-  hide_status_window: false
-  noise_on_completion: false
+  sound_device: null

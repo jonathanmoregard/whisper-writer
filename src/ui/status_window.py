@@ -40,7 +40,7 @@ class StatusWindow(QWidget):
 
         self.icon_label = QLabel()
         self.icon_label.setAlignment(Qt.AlignCenter)
-        microphone_path = os.path.join('assets', 'microphone.png')
+        microphone_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'assets', 'microphone.png')
         pixmap = QPixmap(microphone_path).scaled(80, 80, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.icon_label.setPixmap(pixmap)
         layout.addWidget(self.icon_label)
