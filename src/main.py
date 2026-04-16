@@ -15,6 +15,7 @@ from transcriber_worker import TranscriberWorker
 from typer_worker import TyperWorker
 from ui.settings_window import SettingsWindow
 from ui.status_window import StatusWindow
+from ui.calibration_window import CalibrationWindow
 from transcription import create_local_model
 from input_simulation import InputSimulator
 from utils import ConfigManager
@@ -28,12 +29,14 @@ class WhisperWriterApp(QObject):
         super().__init__()
         self.app = QApplication(sys.argv)
         self.app.setWindowIcon(QIcon(os.path.join('assets', 'ww-logo.png')))
+        self.app.setQuitOnLastWindowClosed(False)
 
         ConfigManager.initialize()
 
         self.settings_window = SettingsWindow()
         self.settings_window.settings_closed.connect(self.on_settings_closed)
         self.settings_window.settings_saved.connect(self.restart_app)
+        self.calibration_window = CalibrationWindow()
 
         if ConfigManager.config_file_exists():
             self.initialize_components()
@@ -76,6 +79,10 @@ class WhisperWriterApp(QObject):
         settings_action = QAction('Open Settings', self.app)
         settings_action.triggered.connect(self.settings_window.show)
         tray_menu.addAction(settings_action)
+
+        calibrate_action = QAction('Calibrate Pitch', self.app)
+        calibrate_action.triggered.connect(self.calibration_window.show)
+        tray_menu.addAction(calibrate_action)
 
         exit_action = QAction('Exit', self.app)
         exit_action.triggered.connect(self.exit_app)
@@ -142,6 +149,7 @@ class WhisperWriterApp(QObject):
 
         if not ConfigManager.get_config_value('misc', 'hide_status_window'):
             self._recorder.statusSignal.connect(self.status_window.updateStatus)
+            self._recorder.pitchSignal.connect(self.status_window.updatePitch)
             self._typer.statusSignal.connect(self.status_window.updateStatus)
             self.status_window.closeSignal.connect(self.stop_pipeline)
 

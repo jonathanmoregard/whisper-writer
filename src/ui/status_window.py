@@ -4,6 +4,26 @@ from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QPixmap, QPainter, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 
+from utils import ConfigManager
+
+_GREEN  = QColor(76, 175, 80, 230)
+_ORANGE = QColor(255, 152, 0, 230)
+_RED    = QColor(244, 67, 54, 230)
+
+
+def _pitch_to_color(hz):
+    target   = ConfigManager.get_config_value('misc', 'pitch_target')
+    unwanted = ConfigManager.get_config_value('misc', 'pitch_unwanted')
+    if target is not None and unwanted is not None:
+        threshold = (target + unwanted) / 2
+        return _GREEN if hz < threshold else _RED
+    # fallback defaults
+    if hz < 130:
+        return _GREEN
+    elif hz < 180:
+        return _ORANGE
+    return _RED
+
 
 class StatusWindow(QWidget):
     closeSignal = pyqtSignal()
@@ -13,6 +33,7 @@ class StatusWindow(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setFixedSize(120, 120)
+        self._border_color = QColor(60, 60, 60, 180)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 12, 12, 12)
@@ -28,7 +49,7 @@ class StatusWindow(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setBrush(QBrush(QColor(255, 255, 255, 160)))
-        painter.setPen(QPen(QColor(60, 60, 60, 180), 2))
+        painter.setPen(QPen(self._border_color, 3))
         painter.drawRoundedRect(1, 1, self.width() - 2, self.height() - 2, 36, 36)
 
     def show(self):
@@ -43,9 +64,15 @@ class StatusWindow(QWidget):
         self.closeSignal.emit()
         super().closeEvent(event)
 
+    @pyqtSlot(float)
+    def updatePitch(self, hz):
+        self._border_color = _pitch_to_color(hz)
+        self.update()
+
     @pyqtSlot(str)
     def updateStatus(self, status):
         if status == 'recording':
+            self._border_color = QColor(60, 60, 60, 180)
             self.show()
         elif status in ('typing', 'idle', 'error', 'cancel'):
             self.hide()
