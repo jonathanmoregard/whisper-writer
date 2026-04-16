@@ -100,7 +100,8 @@ class WhisperWriterApp(QObject):
         QApplication.quit()
 
     def on_activation(self):
-        if not hasattr(self, '_recorder') or self.local_model is None:
+        use_api = ConfigManager.get_config_value('model_options', 'use_api')
+        if not hasattr(self, '_recorder') or (not use_api and self.local_model is None):
             return
         if self._recorder and self._recorder.isRunning():
             recording_mode = ConfigManager.get_config_value('recording_options', 'recording_mode')

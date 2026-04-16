@@ -9,21 +9,20 @@ model_options:
   api:
     api_key: null
     base_url: https://api.openai.com/v1
-    model: whisper-1
+    model: gpt-4o-transcribe
   common:
     initial_prompt: "Clean transcription without filler words."
-    language: en
+    language: null
     temperature: 0.0
   local:
-    beam_size: 1
-    compute_type: int8
+    compute_type: float16
     condition_on_previous_text: true
     device: cuda
     hotwords: []
-    model: distil-medium.en
+    model: small
     model_path: null
     vad_filter: false
-  use_api: false
+  use_api: true
 post_processing:
   add_trailing_space: true
   input_method: xdotool
